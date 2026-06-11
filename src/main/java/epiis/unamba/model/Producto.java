@@ -22,7 +22,7 @@ public class Producto {
 	private Double precio;
 	
 	@Column(nullable = false)
-	private int stock;
+	private Integer stock;
 	
 	@ManyToOne
 	@JoinColumn(name = "categoria_id", nullable = false)
@@ -62,11 +62,11 @@ public class Producto {
 		this.precio = precio;
 	}
 
-	public int getStock() {
+	public Integer getStock() {
 		return stock;
 	}
 
-	public void setStock(int stock) {
+	public void setStock(Integer stock) {
 		this.stock = stock;
 	}
 
