@@ -38,12 +38,10 @@ public class CategoriaService {
 		Categoria existe = this.obtenerPorId(id);
 		
 		if(cat.getNombre() != null)
-			if(!existe.getNombre().equals(cat.getNombre()))
-				existe.setNombre(cat.getNombre());
+			existe.setNombre(cat.getNombre());
 			
 		if(cat.getDescripcion() != null)
-			if(!existe.getDescripcion().equals(cat.getDescripcion()))
-				existe.setDescripcion(cat.getDescripcion());
+			existe.setDescripcion(cat.getDescripcion());
 		return catRepo.save(existe);
 	}
 	
