@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,13 +26,11 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaService catService;
 	
-	//GET: Obtener todo
 	@GetMapping
 	public List<Categoria> listar(){
 		return catService.listar();
 	}
-	
-	//GET: Obtener un objeto para un id especifico
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Categoria> 
 		obtenerPorId(@PathVariable Long id){
@@ -41,7 +40,6 @@ public class CategoriaController {
 		);
 	}
 	
-	//POST: Crear un nuevo objeto
 	@PostMapping
 	public ResponseEntity<Categoria>
 		crear(@RequestBody Categoria categoria){
@@ -52,7 +50,6 @@ public class CategoriaController {
 			);
 	}
 	
-	//PUT: Actualizar todos los valores de un objeto
 	@PutMapping("/{id}")
 	public ResponseEntity<Categoria>
 		actualizar(@PathVariable Long id,@RequestBody Categoria cat){
@@ -62,7 +59,6 @@ public class CategoriaController {
 		);
 	}
 	
-	//PATCH: Actualizar parcialmente un objeto
 	@PatchMapping("/{id}")
 	public ResponseEntity<Categoria>
 		actualizarParcial(@PathVariable Long id, @RequestBody Categoria cat){
@@ -72,7 +68,6 @@ public class CategoriaController {
 			);
 	}
 	
-	//DELETE: Eliminar
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> eliminar(@PathVariable Long id){
 		if(catService.eliminar(id))
@@ -85,12 +80,5 @@ public class CategoriaController {
 				HttpStatus.UNPROCESSABLE_CONTENT
 			);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+		
 }

@@ -54,7 +54,7 @@ public class ProductoService {
 		return prodRepo.save(existe);
 	}
 	
-	private boolean eliminar(Long id) {
+	public boolean eliminar(Long id) {
 		Producto existe = this.obtenerPorId(id);
 		prodRepo.delete(existe);
 		return true;
