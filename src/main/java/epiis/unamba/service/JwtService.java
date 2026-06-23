@@ -17,6 +17,14 @@ public class JwtService {
 	private static final String SECRET_KEY = "Universidad2026.CatalogoAPI.SecretKeySuperSegura!";
 	private static final long EXPIRATION_TIME = 3600000;
 	
+	public Date generarFechaEmision() {
+		return new Date(System.currentTimeMillis());
+	}
+	
+	public Date generarFechaExpiracion() {
+		return new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+	}
+	
 	private SecretKey getSigninKey() {
 		return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 	}
@@ -36,6 +44,26 @@ public class JwtService {
 			.signWith(getSigninKey())
 			.compact();
 		
+	}
+
+	public boolean isValidToken(String token) {
+		try {
+			Jwts.parser().verifyWith(getSigninKey()).build()
+			.parseSignedClaims(token);
+			
+			return true;
+		}catch(Exception e) {
+			return false;
+		}
+	}
+
+	public String getUsername(String token) {
+		return Jwts.parser()
+				.verifyWith(getSigninKey())
+				.build()
+				.parseSignedClaims(token)
+				.getPayload()
+				.getSubject();
 	}
 	
 	
