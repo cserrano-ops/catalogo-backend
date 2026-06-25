@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import epiis.unamba.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,17 +29,31 @@ public class JwtFilter extends OncePerRequestFilter{
 			FilterChain filterChain)
 		throws ServletException, IOException {
 		
+		String path = request.getServletPath();
+		
+		if(path.startsWith("/api/auth")) { //ENDPOINT LIBRE SIN VALIDACION DE TOKEN
+			filterChain.doFilter(request, response);
+			return;
+		}
+		
+		//ENDPOINTS CON VALIDACION
 		String authHeader = request.getHeader("Authorization");
 		if(authHeader != null && authHeader.startsWith("Bearer ")) {
 			String token = authHeader.substring(7);
 			
-			if(jwtService.isValidToken(token)) {
+			try {
+				jwtService.isValidToken(token);
+				
 				String username = jwtService.getUsername(token);
 				UsernamePasswordAuthenticationToken authentication =
 						new UsernamePasswordAuthenticationToken(
 								username, null, Collections.emptyList()
 						);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}catch(ExpiredJwtException e) {
+				request.setAttribute("error_jwt", "TOKEN_EXPIRED");
+			}catch(Exception e) {
+				request.setAttribute("error_jwt", "TOKEN_INVALID");
 			}
 		}
 

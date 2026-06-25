@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -59,9 +60,37 @@ public class AuthController {
 			return ResponseEntity.ok(respuesta);
 		}else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Credenciales inválidas");
+					.body("{\"error\" : \"Credenciales inválidas\"}");
 		}
 	}
+	
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refrescarToken(
+		@RequestHeader(value = "Authorization", required = false) String authHeader
+		){
+		
+		if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("{\"error\" : \"Falta token de autorización\"}");
+		}
+		
+		String tokenAntiguo = authHeader.substring(7);
+		try {
+			AuthResponse response = jwtService.refrescarToken(tokenAntiguo);
+			return ResponseEntity.ok(response);
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body("{\"error\" : \"Token inválido. No se puede renovar\"}");
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

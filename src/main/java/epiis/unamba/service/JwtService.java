@@ -6,16 +6,23 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import epiis.unamba.dto.AuthResponse;
 import epiis.unamba.model.Usuario;
+import epiis.unamba.repository.UsuarioRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
 	private static final String SECRET_KEY = "Universidad2026.CatalogoAPI.SecretKeySuperSegura!";
-	private static final long EXPIRATION_TIME = 3600000;
+	private static final long EXPIRATION_TIME = 60000; //3600000; //1 hora
+	
+	@Autowired
+	UsuarioRepository usuarioRepo;
 	
 	public Date generarFechaEmision() {
 		return new Date(System.currentTimeMillis());
@@ -45,25 +52,36 @@ public class JwtService {
 			.compact();
 		
 	}
+	
+	public AuthResponse refrescarToken(String token) {
+		String username = this.getUsername(token);
+		Usuario usuario = usuarioRepo.findByUsername(username)
+				.orElseThrow( () -> new RuntimeException("Usuario no encontrado"));
+		return new AuthResponse(
+				this.generarToken(usuario),
+				usuario.getUsername(),
+				usuario.getRol(),
+				this.generarFechaEmision(),
+				this.generarFechaExpiracion()
+			);
+	}
 
-	public boolean isValidToken(String token) {
-		try {
-			Jwts.parser().verifyWith(getSigninKey()).build()
-			.parseSignedClaims(token);
-			
-			return true;
-		}catch(Exception e) {
-			return false;
-		}
+	public void isValidToken(String token) {
+		Jwts.parser().verifyWith(getSigninKey()).build()
+		.parseSignedClaims(token);
 	}
 
 	public String getUsername(String token) {
-		return Jwts.parser()
+		try {
+			return Jwts.parser()
 				.verifyWith(getSigninKey())
 				.build()
 				.parseSignedClaims(token)
 				.getPayload()
 				.getSubject();
+		}catch(ExpiredJwtException e) {
+			return e.getClaims().getSubject();
+		}
 	}
 	
 	
@@ -74,3 +92,4 @@ public class JwtService {
 	
 	
 }
+	
